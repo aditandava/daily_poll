@@ -58,6 +58,12 @@ def pin_message(message_id):
     response = requests.post(url, json=payload)
     print("Pin message response:", response.json())
 
+def delete_message(message_id):
+    url = f"{BASE_URL}/deleteMessage"
+    payload = {"chat_id": CHAT_ID, "message_id": message_id}
+    response = requests.post(url, json=payload)
+    print(f"Delete message {message_id} response:", response.json())
+
 def main():
     if not TOKEN or not CHAT_ID:
         print("Error: TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set in the environment.")
@@ -88,6 +94,11 @@ def main():
     if new_msg_id:
         print(f"Pinning new poll with message ID: {new_msg_id}")
         pin_message(new_msg_id)
+
+        # Telegram generates a "Bot pinned a message" service message.
+        # It's highly likely to be the immediate next message ID.
+        print(f"Attempting to delete the pin service message (ID: {new_msg_id + 1})")
+        delete_message(new_msg_id + 1)
 
         # Update and save state configuration
         state["last_message_id"] = new_msg_id
